@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Personal AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:white;font-family:Arial,sans-serif}
+header{padding:20px;background:#121b30;text-align:center;font-size:22px;font-weight:bold}
+main{max-width:700px;margin:50px auto;padding:20px}
+h1{text-align:center;color:#a9caff}
+p{text-align:center;color:#aab5ca}
+#chat{min-height:250px;padding:15px;background:#121b30;border-radius:15px;margin:20px 0}
+input{width:75%;padding:15px;border:0;border-radius:10px}
+button{padding:15px;border:0;border-radius:10px;background:#8bcfff;color:#10182b;font-weight:bold}
+.msg{padding:12px;margin:10px 0;background:#20314d;border-radius:10px}
+</style>
+</head>
+<body>
+<header>✦ My Personal AI</header>
+<main>
+<h1>তোমার Personal AI Assistant</h1>
+<p>বাংলা অথবা English-এ প্রশ্ন করো</p>
+<div id="chat">
+<div class="msg">হ্যালো! আমি তোমার AI Assistant। কীভাবে সাহায্য করব?</div>
+</div>
+<input id="question" placeholder="তোমার প্রশ্ন লেখো...">
+<button onclick="send()">Send</button>
+</main>
+<script>
+async function send(){
+const box=document.getElementById('question');
+const chat=document.getElementById('chat');
+const message=box.value.trim();
+if(!message)return;
+chat.innerHTML+='<div class="msg">You: '+escapeText(message)+'</div>';
+box.value='';
+const loading=document.createElement('div');
+loading.className='msg';
+loading.textContent='AI ভাবছে...';
+chat.appendChild(loading);
+try{
+const response=await fetch('/api/chat',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({message})
+});
+const data=await response.json();
+if(!response.ok)throw new Error(data.error||'Connection error');
+loading.textContent='AI: '+data.reply;
+}catch(error){
+loading.textContent='সমস্যা: '+error.message;
+}
+}
+function escapeText(s){
+const d=document.createElement('div');
+d.textContent=s;
+return d.innerHTML;
+}
+</script>
+</body>
+</html>
